@@ -82,10 +82,14 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error. User not logged in"
+        });
     }
 }
 
 export {
-    signup
+    signup,
+    login
 }
