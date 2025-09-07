@@ -1,5 +1,5 @@
-import generateToken from "../lib/jwtToken";
-import User from "../models/user.model";
+import { generateToken } from "../lib/jwtToken.js";
+import User from "../models/user.model.js";
 import bcrypt from 'bcrypt'
 
 const signup = async (req, res) => {
@@ -56,8 +56,8 @@ const login = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({email}).select('-password');
-        if(!user){
+        const user = await User.findOne({ email });
+        if (!user) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid Credentials"
@@ -67,21 +67,22 @@ const login = async (req, res) => {
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         console.log(isPasswordCorrect);
-        if(!isPasswordCorrect){
+        if (!isPasswordCorrect) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid Credentials"
             });
         }
 
-        generateToken({userId: user._id, email});
+        const token = generateToken({ userId: user._id, email }, res);
         res.status(200).json({
-           success: true,
-           message: "logged in successfully",
-           user
+            success: true,
+            message: "logged in successfully",
+            token
         });
 
     } catch (error) {
+        console.log("Error in logged in", error);
         res.status(500).json({
             success: false,
             message: "Internal Server Error. User not logged in"
@@ -89,7 +90,28 @@ const login = async (req, res) => {
     }
 }
 
+const logout = async (req, res) => {
+    try {
+        if (res.cookies?.token) {
+            res.clearCookie("token");
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+
+    } catch (error) {
+        console.error("Logout error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong during logout",
+        });
+    }
+}
+
 export {
     signup,
-    login
+    login,
+    logout
 }
