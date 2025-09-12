@@ -41,7 +41,6 @@ const LoginPage = () => {
       const res = await login(formData); // Make sure your login returns { success, message }
 
       if (res?.success) {
-        toast.success("Logged in successfully!");
         navigate("/"); // redirect to chat home or dashboard
       } else {
         toast.error(res?.message || "Invalid credentials. Try again!");
