@@ -29,7 +29,7 @@ const Navbar = () => {
         {/* Profile */}
         <div className="flex items-center space-x-2 cursor-pointer hover:text-orange-500" title={authUser?.username}>
           <User size={20} />
-          <span className="hidden md:inline">{authUser?.username || "User"}</span>
+          <span className="hidden md:inline" onClick={() => navigate('/profile')}>{authUser?.username || "User"}</span>
         </div>
 
         {/* Settings */}
