@@ -34,7 +34,6 @@ const signup = async (req, res) => {
             res.status(201).json({
                 success: true,
                 message: "registered successfully",
-                newUser
             });
         }
     } catch (error) {
@@ -66,7 +65,7 @@ const login = async (req, res) => {
 
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        console.log(isPasswordCorrect);
+        // console.log(isPasswordCorrect);
         if (!isPasswordCorrect) {
             return res.status(400).json({
                 success: false,
@@ -74,10 +73,13 @@ const login = async (req, res) => {
             });
         }
 
+        const { password: _, ...safeUser } = user.toObject();
+
         const token = generateToken({ userId: user._id, email }, res);
         res.status(200).json({
             success: true,
             message: "logged in successfully",
+            user: safeUser,
             token
         });
 
@@ -92,10 +94,13 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        if (res.cookies?.token) {
-            res.clearCookie("token");
-        }
+        const isProd = process.env.NODE_ENV === 'production';
 
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
+        });
         return res.status(200).json({
             success: true,
             message: "Logged out successfully",
@@ -110,13 +115,22 @@ const logout = async (req, res) => {
     }
 }
 
-const checkAuth = (req, res) => {
+const checkAuth = async (req, res) => {
     try {
+        const email = req.user.email;
+        const user = await User.findOne({ email }).select("-password").lean();
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not authenticated"
+            });
+        }
+        console.log("User is authenticated");
         res.status(200).json({
             success: true,
             message: "User is authenticated",
-            user: req.user
-        })
+            user
+        });
     } catch (error) {
         console.log("Error in authentication controller.", error.message);
         res.status(500).json({
