@@ -50,7 +50,38 @@ const getMessages = async (req, res) => {
     }
 }
 
+const sendMessage = async (req, res) => {
+    try {
+        const { text } = req.body;
+        const { id: receiverId } = req.params;
+        const senderId = req.user.userId;
+
+        const newMessage = new Message({
+            sender: senderId,
+            receiver: receiverId,
+            message: text
+        })
+
+        await newMessage.save();
+
+        // todo: socket.io implementation
+
+        res.status(200).json({
+            success: true,
+            message: "message sent",
+            newMessage
+        })
+    } catch (error) {
+        console.log("Error in sending message", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error. Message not sent."
+        });
+    }
+}
+
 export {
     getUsersForSidebar,
-    getMessages
+    getMessages,
+    sendMessage
 }
