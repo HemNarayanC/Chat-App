@@ -1,11 +1,11 @@
-import { Settings, LogOut, User } from "lucide-react";
+import { Settings, LogOut, User, LogIn } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { authUser, logout } = useAuthStore();
+  const { authUser, logout, login } = useAuthStore();
 
   const handleLogout = async () => {
     try {
@@ -38,9 +38,11 @@ const Navbar = () => {
         </div>
 
         {/* Logout */}
-        <div className="cursor-pointer hover:text-orange-500" title="Logout" onClick={handleLogout}>
+        {authUser ? (<div className="cursor-pointer hover:text-orange-500" title="Logout" onClick={handleLogout}>
           <LogOut size={20} />
-        </div>
+        </div>) : (<div className="cursor-pointer hover:text-orange-500" title="Login" onClick={() => navigate("/login")}>
+          <LogIn size={20} />
+        </div>)}
       </div>
     </nav>
   );
