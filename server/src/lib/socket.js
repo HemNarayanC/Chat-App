@@ -8,12 +8,24 @@ import express from "express"
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  process.env.CLIENT_URL_DEV,
+  process.env.CLIENT_URL_PROD
+];
+
 const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT_URL,
-        credentials: true
-    }
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by Socket.IO CORS'));
+      }
+    },
+    credentials: true
+  }
 });
+
 // console.log(process.env.CLIENT_URL)
 
 export function getReceiverSocketId(userId) {
