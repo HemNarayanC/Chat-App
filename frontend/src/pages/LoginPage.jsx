@@ -39,6 +39,7 @@ const LoginPage = () => {
 
     try {
       const res = await login(formData); // Make sure your login returns { success, message }
+      // console.log("From Login Page", res);
 
       if (res?.success) {
         navigate("/"); // redirect to chat home or dashboard
