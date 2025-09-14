@@ -7,25 +7,17 @@ import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
 import Navbar from './components/Navbar'
 import useAuthStore from './store/useAuthStore'
-import { useThemeStore } from './store/useThemeStore'
 import { Loader } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
 
 const App = () => {
-  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
-  const {theme} = useThemeStore();
-
-  console.log("Online Users: ", onlineUsers)
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   console.log({ authUser });
-
-    useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "aqua");
-  }, [theme]);
 
   if (isCheckingAuth && !authUser) {
     return (
